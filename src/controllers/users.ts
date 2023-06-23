@@ -20,7 +20,7 @@ export const getUserById = (req: Request, res: Response, next: NextFunction) => 
     })
     .catch((err) => {
       if (err.message.includes('Cast to ObjectId failed')) {
-        return next(new NotFoundError('Пользователь с указанным _id не найден'));
+        return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);
     });
@@ -52,7 +52,7 @@ export const updateProfile = (req: CustomRequest, res: Response, next: NextFunct
         return next(new NotCorrectDataError('Переданы некорректные данные при обновлении профиля'));
       }
       if (err.message.includes('Cast to ObjectId failed')) {
-        return next(new NotFoundError('Пользователь с указанным _id не найден'));
+        return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);
     });
@@ -70,7 +70,7 @@ export const updateAvatar = (req: CustomRequest, res: Response, next: NextFuncti
         return next(new NotCorrectDataError('Переданы некорректные данные при обновлении аватара'));
       }
       if (err.message.includes('Cast to ObjectId failed')) {
-        return next(new NotFoundError('Пользователь с указанным _id не найден'));
+        return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);
     });

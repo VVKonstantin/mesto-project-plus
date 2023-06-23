@@ -1,4 +1,5 @@
 import express, { NextFunction, Response } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import mongoose from 'mongoose';
 import { CustomRequest } from './types/request';
 import router from './routes';
@@ -8,6 +9,16 @@ import { ERR_SERVER_INTERNAL } from './constants';
 const { PORT = 3000 } = process.env;
 
 const app = express();
+
+// limit 100 all requests per 15 minutes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 
 // connect to db
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
