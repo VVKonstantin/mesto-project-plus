@@ -36,7 +36,7 @@ export const delCardById = (req: Request, res: Response, next: NextFunction) => 
     })
     .catch((err) => {
       if (err.message.includes('Cast to ObjectId failed')) {
-        return next(new NotFoundError('Карточка с указанным _id не найдена'));
+        return next(new NotCorrectDataError('Передан некорректный _id карточки'));
       }
       return next(err);
     });
@@ -55,7 +55,7 @@ export const likeCard = (req: CustomRequest, res: Response, next: NextFunction) 
     })
     .catch((err) => {
       if (err.message.includes('Cast to ObjectId failed')) {
-        return next(new NotFoundError('Передан несуществующий _id карточки'));
+        return next(new NotCorrectDataError('Передан некорректный _id карточки'));
       }
       if (err.name === 'ValidationError') {
         return next(new NotCorrectDataError('Переданы некорректные данные для постановки/снятии лайка'));
@@ -77,7 +77,7 @@ export const dislikeCard = (req: CustomRequest, res: Response, next: NextFunctio
     })
     .catch((err) => {
       if (err.message.includes('Cast to ObjectId failed')) {
-        return next(new NotFoundError('Передан несуществующий _id карточки'));
+        return next(new NotCorrectDataError('Передан некорректный _id карточки'));
       }
       if (err.name === 'ValidationError') {
         return next(new NotCorrectDataError('Переданы некорректные данные для постановки/снятии лайка'));
