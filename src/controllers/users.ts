@@ -32,7 +32,7 @@ export const getCurrentUser = (req: CustomRequest, res: Response, next: NextFunc
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);
@@ -47,7 +47,7 @@ export const getUserById = (req: Request, res: Response, next: NextFunction) => 
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);
@@ -94,7 +94,7 @@ export const updateProfile = (req: CustomRequest, res: Response, next: NextFunct
       if (err.name === 'ValidationError') {
         return next(new NotCorrectDataError('Переданы некорректные данные при обновлении профиля'));
       }
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);
@@ -113,7 +113,7 @@ export const updateAvatar = (req: CustomRequest, res: Response, next: NextFuncti
         const mess = `${Object.values(err.errors).map((error: any) => error.message).join(', ')}`;
         return next(new NotCorrectDataError(mess));
       }
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Некорректный _id пользователя'));
       }
       return next(err);

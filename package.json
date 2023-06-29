@@ -38,6 +38,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.3.0",
     "validator": "^13.9.0",
-    "winston": "^3.9.0"
+    "winston": "^3.9.0",
+    "winston-telegram": "^2.6.0"
   }
 }
