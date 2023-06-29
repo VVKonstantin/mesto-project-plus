@@ -3,6 +3,7 @@ import Card from '../models/card';
 import { CustomRequest } from '../types/request';
 import NotCorrectDataError from '../errors/not-correct-data';
 import NotFoundError from '../errors/not-found-err';
+import ForbiddenActionError from '../errors/forbidden';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card
@@ -26,12 +27,15 @@ export const createCard = (req: CustomRequest, res: Response, next: NextFunction
     });
 };
 
-export const delCardById = (req: Request, res: Response, next: NextFunction) => {
+export const delCardById = (req: CustomRequest, res: Response, next: NextFunction) => {
   Card
     .findById({ _id: req.params.cardId })
     .then((card) => {
       if (card === null) return next(new NotFoundError('Карточка с указанным _id не найдена'));
-      card?.deleteOne();
+      if (card.owner.toString() !== req.user?._id) {
+        return next(new ForbiddenActionError('Нельзя удалять карточки других пользователей'));
+      }
+      card.deleteOne();
       return res.status(200).send(card);
     })
     .catch((err) => {
