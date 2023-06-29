@@ -20,7 +20,7 @@ export const validCreateUser = celebrate({
 
 export const validGetUserById = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().hex().required(),
+    userId: Joi.string().hex().length(24).required(),
   }),
 });
 
@@ -46,18 +46,18 @@ export const validCreateCard = celebrate({
 
 export const validDelCardById = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().required(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 });
 
 export const validLikeCard = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().required(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 });
 
 export const validDislikeCard = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().hex().required(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 });
