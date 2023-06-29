@@ -30,16 +30,16 @@ export const createCard = (req: CustomRequest, res: Response, next: NextFunction
 export const delCardById = (req: CustomRequest, res: Response, next: NextFunction) => {
   Card
     .findById({ _id: req.params.cardId })
-    .then((card) => {
+    .then(async (card) => {
       if (card === null) return next(new NotFoundError('Карточка с указанным _id не найдена'));
       if (card.owner.toString() !== req.user?._id) {
         return next(new ForbiddenActionError('Нельзя удалять карточки других пользователей'));
       }
-      card.deleteOne();
-      return res.status(200).send(card);
+      return card.deleteOne()
+        .then((delCard) => res.status(200).send(delCard));
     })
     .catch((err) => {
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Передан некорректный _id карточки'));
       }
       return next(err);
@@ -51,18 +51,15 @@ export const likeCard = (req: CustomRequest, res: Response, next: NextFunction) 
     .findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user?._id } },
-      { new: true, runValidators: true },
+      { new: true },
     )
     .then((card) => {
       if (card === null) return next(new NotFoundError('Передан несуществующий _id карточки'));
       return res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Передан некорректный _id карточки'));
-      }
-      if (err.name === 'ValidationError') {
-        return next(new NotCorrectDataError('Переданы некорректные данные для постановки/снятии лайка'));
       }
       return next(err);
     });
@@ -73,18 +70,15 @@ export const dislikeCard = (req: CustomRequest, res: Response, next: NextFunctio
     .findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user?._id } },
-      { new: true, runValidators: true },
+      { new: true },
     )
     .then((card) => {
       if (card === null) return next(new NotFoundError('Передан несуществующий _id карточки'));
       return res.status(200).send({ data: card });
     })
     .catch((err) => {
-      if (err.message.includes('Cast to ObjectId failed')) {
+      if (err.name === 'CastError') {
         return next(new NotCorrectDataError('Передан некорректный _id карточки'));
-      }
-      if (err.name === 'ValidationError') {
-        return next(new NotCorrectDataError('Переданы некорректные данные для постановки/снятии лайка'));
       }
       return next(err);
     });
