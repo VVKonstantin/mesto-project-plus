@@ -1,52 +1,37 @@
-import express, { NextFunction, Response } from 'express';
-import { rateLimit } from 'express-rate-limit';
+import express from 'express';
 import mongoose from 'mongoose';
-import { CustomRequest } from './types/request';
+import { errors } from 'celebrate';
 import router from './routes';
-import { Error } from './types/error';
-import { ERR_SERVER_INTERNAL } from './constants';
+import { createUser, login } from './controllers/users';
+import auth from './middlewares/auth';
+import errorCatcher from './middlewares/error-catcher';
+import { validCreateUser, validLogin } from './middlewares/validation';
+import { requestLogger, errorLogger } from './middlewares/logger';
+import { limiter } from './constants';
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
-// limit 100 all requests per 15 minutes
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 app.use(limiter);
 
-// connect to db
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-// body-parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// temp solution for authorization
-app.use((req: CustomRequest, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '64919905f0e54b93e8d21cd7',
-  };
-  next();
-});
+app.use(requestLogger);
 
-// route
+app.post('/signin', validLogin, login);
+app.post('/signup', validCreateUser, createUser);
+
+app.use(auth);
+
 app.use('/', router);
 
-// common errors processing
-app.use((err: Error, req: CustomRequest, res: Response, next: NextFunction) => {
-  const { statusCode = ERR_SERVER_INTERNAL, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === ERR_SERVER_INTERNAL ? 'На сервере произошла ошибка' : message,
-    });
-  next();
-});
+app.use(errorLogger);
+
+app.use(errors());
+app.use(errorCatcher);
 
 app.listen(PORT);
