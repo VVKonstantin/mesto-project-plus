@@ -8,12 +8,16 @@ import NotCorrectDataError from '../errors/not-correct-data';
 import ConflictError from '../errors/conflict';
 import { SECRET_KEY } from '../constants';
 
-// eslint-disable-next-line no-unused-vars
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
+  const { JWT_SECRET = SECRET_KEY } = process.env;
 
   return User.findUserByCredentials(email, password)
-    .then((user) => res.send({ token: jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' }) }))
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: true });
+      return res.status(200).json({ message: 'Вы успешно авторизовались' });
+    })
     .catch(next);
 };
 

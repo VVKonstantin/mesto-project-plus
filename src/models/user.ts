@@ -21,14 +21,14 @@ interface UserModel extends mongoose.Model<IUser> {
 const userSchema = new mongoose.Schema<IUser, UserModel>({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Минимальная длина 2 символа'],
+    maxlength: [30, 'Максимальная длина 30 символов'],
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 200,
+    minlength: [2, 'Минимальная длина 2 символа'],
+    maxlength: [200, 'Максимальная длина 200 символов'],
     default: 'Исследователь',
   },
   avatar: {
@@ -53,6 +53,8 @@ const userSchema = new mongoose.Schema<IUser, UserModel>({
     required: true,
     select: false,
   },
+}, {
+  versionKey: false,
 });
 
 userSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {

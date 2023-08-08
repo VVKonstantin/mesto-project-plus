@@ -8,17 +8,13 @@ interface SessionRequest extends Request {
 }
 
 export default (req: SessionRequest, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new WrongAuthError('Необходима авторизация'));
-  }
-
-  const token = authorization.replace('Bearer ', '');
+  const token = req.cookies.jwt;
+  const { JWT_SECRET = SECRET_KEY } = process.env;
+  if (!token) return next(new WrongAuthError('Необходима авторизация'));
   let payload;
 
   try {
-    payload = jwt.verify(token, SECRET_KEY);
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return next(new WrongAuthError('Необходима авторизация'));
   }
