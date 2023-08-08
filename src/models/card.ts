@@ -12,8 +12,8 @@ interface ICard {
 const cardSchema = new mongoose.Schema<ICard>({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Минимальная длина 2 символа'],
+    maxlength: [30, 'Максимальная длина 30 символов'],
     required: true,
   },
   link: {
@@ -38,6 +38,9 @@ const cardSchema = new mongoose.Schema<ICard>({
     type: Date,
     default: Date.now,
   },
+}, {
+  versionKey: false,
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
 });
 
 export default mongoose.model<ICard>('card', cardSchema);
